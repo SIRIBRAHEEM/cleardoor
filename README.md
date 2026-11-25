@@ -42,6 +42,12 @@ node scripts/e2e.mjs   # 16 browser checks + screenshots into docs/
   clear version.
 - `src/App.jsx` is the interface: three views (Make it clear, Read, My
   library). Lessons and reader settings persist in localStorage.
+- The interface is built with Tailwind CSS and a small design system of
+  hand-built components in `src/components/ui.jsx` (buttons, cards,
+  badges, fields, segmented controls) in the shadcn/ui style. The look
+  is an accessibility-first reading room: solid white surfaces, deep
+  teal, extra-large readable type, generous spacing and big clear
+  buttons, with strong focus rings for keyboard users.
 - Read aloud uses the browser speechSynthesis voice, so it works with
   no server and no API key.
 - Fonts (Sora and Atkinson Hyperlegible) are self-hosted in

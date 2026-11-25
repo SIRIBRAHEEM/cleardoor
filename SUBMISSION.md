@@ -73,8 +73,11 @@ the class.
 ## Technologies
 
 - React and Vite for the app.
-- Plain CSS with a liquid glass design: frosted translucent panels,
-  backdrop blur, soft gradient colour, layered depth.
+- Tailwind CSS with a small design system of hand-built components
+  (buttons, cards, badges, form fields, segmented controls) in the
+  shadcn/ui style. The design is an accessibility-first reading room:
+  solid white surfaces, deep teal, extra-large readable type, generous
+  spacing, big clear buttons and strong focus rings.
 - Sora for headings and Atkinson Hyperlegible for body text, both
   self-hosted so the app works offline.
 - localStorage for the offline lesson library and reader settings.

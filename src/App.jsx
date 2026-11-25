@@ -7,6 +7,16 @@ import {
   formatDate,
 } from "./lib/text.js";
 import { SAMPLE_TITLE, SAMPLE_TEXT, SAMPLE_SAVED } from "./lib/sample.js";
+import {
+  Badge,
+  Button,
+  Card,
+  Input,
+  Label,
+  SegmentedControl,
+  Select,
+  Textarea,
+} from "./components/ui.jsx";
 
 const STORE_KEY = "cleardoor-lessons-v1";
 const SETTINGS_KEY = "cleardoor-reader-v1";
@@ -30,6 +40,12 @@ function loadSettings() {
   }
   return { size: 20, spacing: 1.7, theme: "paper", rate: 1 };
 }
+
+const VIEWS = [
+  ["make", "Make it clear"],
+  ["read", "Read"],
+  ["library", "My library"],
+];
 
 export default function App() {
   const [view, setView] = useState("make");
@@ -175,15 +191,14 @@ export default function App() {
   );
 
   return (
-    <div className="scene">
-      <div className="blob blob-a" aria-hidden="true" />
-      <div className="blob blob-b" aria-hidden="true" />
-      <div className="blob blob-c" aria-hidden="true" />
-
-      <header className="topbar glass">
-        <div className="brand">
-          <span className="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+    <div className="mx-auto max-w-6xl px-4 pb-10 pt-5 sm:px-6">
+      <header className="topbar sticky top-3 z-20 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-line bg-white/95 px-5 py-4 shadow-[0_2px_10px_rgba(11,79,74,0.07)] backdrop-blur">
+        <div className="flex items-center gap-3.5">
+          <span
+            className="grid h-12 w-12 place-items-center rounded-xl bg-teal-deep text-white"
+            aria-hidden="true"
+          >
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
               <path
                 d="M5 21V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v17"
                 stroke="currentColor"
@@ -200,22 +215,29 @@ export default function App() {
             </svg>
           </span>
           <div>
-            <h1>ClearDoor</h1>
-            <p>Lessons everyone can read, even offline.</p>
+            <h1 className="font-display text-2xl font-bold tracking-tight">
+              ClearDoor
+            </h1>
+            <p className="text-sm text-ink-soft">
+              Lessons everyone can read, even offline.
+            </p>
           </div>
         </div>
-        <nav className="tabs" aria-label="Main">
-          {[
-            ["make", "Make it clear"],
-            ["read", "Read"],
-            ["library", "My library"],
-          ].map(([key, label]) => (
+        <nav
+          className="flex flex-wrap gap-1 rounded-full border-2 border-line bg-teal-tint p-1"
+          aria-label="Main"
+        >
+          {VIEWS.map(([key, label]) => (
             <button
               key={key}
               type="button"
-              className={view === key ? "tab active" : "tab"}
-              onClick={() => setView(key)}
               aria-pressed={view === key}
+              onClick={() => setView(key)}
+              className={`min-h-11 rounded-full px-5 py-2 font-display text-sm font-semibold transition-colors ${
+                view === key
+                  ? "bg-teal-deep text-white shadow-sm"
+                  : "text-teal-deep hover:bg-white"
+              }`}
             >
               {label}
             </button>
@@ -224,64 +246,62 @@ export default function App() {
       </header>
 
       {notice && (
-        <div className="notice glass" role="status">
+        <div
+          className="notice mt-4 rounded-xl border border-teal-main/40 bg-teal-soft px-5 py-3 text-center font-bold text-teal-deep"
+          role="status"
+        >
           {notice}
         </div>
       )}
 
-      <main className="wrap">
+      <main className="mt-5">
         {view === "make" && (
-          <section className="grid-two">
-            <div className="panel glass">
-              <h2>1. Paste the hard lesson</h2>
-              <p className="hint">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <Card className="p-6">
+              <h2 className="font-display text-xl font-bold">
+                1. Paste the hard lesson
+              </h2>
+              <p className="mt-2 leading-relaxed text-ink-soft">
                 Copy text from a textbook, worksheet or PDF. ClearDoor swaps
                 hard words for plain ones and breaks long sentences into
                 short ones.
               </p>
-              <label className="field-label" htmlFor="lesson-title">
-                Lesson title
-              </label>
-              <input
-                id="lesson-title"
-                className="text-input"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Photosynthesis"
-              />
-              <label className="field-label" htmlFor="lesson-text">
-                Lesson text
-              </label>
-              <textarea
-                id="lesson-text"
-                className="text-area"
-                rows={12}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Paste the lesson here..."
-              />
-              <div className="stat-row" aria-live="polite">
-                <span className="chip">
+              <div className="mt-5">
+                <Label htmlFor="lesson-title">Lesson title</Label>
+                <Input
+                  id="lesson-title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Photosynthesis"
+                />
+              </div>
+              <div className="mt-4">
+                <Label htmlFor="lesson-text">Lesson text</Label>
+                <Textarea
+                  id="lesson-text"
+                  rows={12}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Paste the lesson here..."
+                  className="leading-relaxed"
+                />
+              </div>
+              <div
+                className="mt-4 flex flex-wrap gap-2"
+                aria-live="polite"
+              >
+                <Badge>
                   Reading level: grade {liveStats.grade} (
                   {gradeLabel(liveStats.grade)})
-                </span>
-                <span className="chip">{liveStats.words} words</span>
-                <span className="chip">
-                  {liveStats.avgSentence} words per sentence
-                </span>
-                <span className="chip">{liveStats.hardWords} hard words</span>
+                </Badge>
+                <Badge>{liveStats.words} words</Badge>
+                <Badge>{liveStats.avgSentence} words per sentence</Badge>
+                <Badge>{liveStats.hardWords} hard words</Badge>
               </div>
-              <div className="actions">
-                <button
-                  type="button"
-                  className="btn primary"
-                  onClick={handleSimplify}
-                >
-                  Make it clear
-                </button>
-                <button
-                  type="button"
-                  className="btn ghost"
+              <div className="mt-5 flex flex-wrap gap-2.5">
+                <Button onClick={handleSimplify}>Make it clear</Button>
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     setTitle(SAMPLE_TITLE);
                     setInput(SAMPLE_TEXT);
@@ -289,10 +309,9 @@ export default function App() {
                   }}
                 >
                   Load sample lesson
-                </button>
-                <button
-                  type="button"
-                  className="btn ghost"
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     setTitle("");
                     setInput("");
@@ -300,20 +319,22 @@ export default function App() {
                   }}
                 >
                   Clear
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
 
-            <div className="panel glass">
-              <h2>2. The clear version</h2>
+            <Card className="p-6">
+              <h2 className="font-display text-xl font-bold">
+                2. The clear version
+              </h2>
               {!result ? (
-                <div className="empty">
+                <div className="mt-3 leading-relaxed text-ink-soft">
                   <p>
                     Your plain-language version will appear here, with a
                     before and after reading level so you can see the
                     difference.
                   </p>
-                  <ul className="ticks">
+                  <ul className="mt-3 list-disc space-y-1.5 pl-5">
                     <li>Hard words swapped for everyday words</li>
                     <li>Long sentences split into short ones</li>
                     <li>Reading level measured before and after</li>
@@ -321,62 +342,67 @@ export default function App() {
                 </div>
               ) : (
                 <>
-                  <div className="compare">
-                    <div className="compare-box">
-                      <span className="compare-label">Before</span>
-                      <strong>Grade {result.before.grade}</strong>
+                  <div className="mt-4 flex items-stretch gap-3">
+                    <div className="compare-box flex flex-1 flex-col gap-1 rounded-xl border border-warm/40 bg-warm-soft p-4 text-sm">
+                      <span className="font-display text-xs font-bold uppercase tracking-wider text-warm">
+                        Before
+                      </span>
+                      <strong className="font-display text-xl">
+                        Grade {result.before.grade}
+                      </strong>
                       <span>
                         {result.before.avgSentence} words per sentence
                       </span>
                       <span>{result.before.hardWords} hard words</span>
                     </div>
-                    <div className="compare-arrow" aria-hidden="true">
+                    <div
+                      className="self-center text-2xl text-teal-deep"
+                      aria-hidden="true"
+                    >
                       &#8594;
                     </div>
-                    <div className="compare-box good">
-                      <span className="compare-label">After</span>
-                      <strong>Grade {result.after.grade}</strong>
+                    <div className="compare-box flex flex-1 flex-col gap-1 rounded-xl border border-teal-main/40 bg-teal-soft p-4 text-sm">
+                      <span className="font-display text-xs font-bold uppercase tracking-wider text-teal-deep">
+                        After
+                      </span>
+                      <strong className="font-display text-xl">
+                        Grade {result.after.grade}
+                      </strong>
                       <span>
                         {result.after.avgSentence} words per sentence
                       </span>
                       <span>{result.after.hardWords} hard words</span>
                     </div>
                   </div>
-                  <div className="result-text" tabIndex={0}>
+                  <div
+                    className="result-text mt-4 max-h-[340px] overflow-y-auto rounded-xl border border-line bg-teal-tint px-5 py-4 leading-[1.75]"
+                    tabIndex={0}
+                  >
                     {result.text.split(/\n\s*\n/).map((p, i) => (
-                      <p key={i}>{p}</p>
+                      <p key={i} className="mb-3 last:mb-0">
+                        {p}
+                      </p>
                     ))}
                   </div>
                   {result.changes.length > 0 && (
-                    <details className="changes">
-                      <summary>
+                    <details className="mt-3 text-[0.95rem]">
+                      <summary className="cursor-pointer font-display font-semibold text-teal-deep">
                         Words made plain ({result.changes.length})
                       </summary>
-                      <p className="change-list">
+                      <p className="mt-1.5 leading-relaxed text-ink-soft">
                         {result.changes
                           .map((c) => `${c.from} to ${c.to}`)
                           .join(", ")}
                       </p>
                     </details>
                   )}
-                  <div className="actions">
-                    <button
-                      type="button"
-                      className="btn primary"
-                      onClick={handleSave}
-                    >
-                      Save to library
-                    </button>
-                    <button
-                      type="button"
-                      className="btn ghost"
-                      onClick={handleCopy}
-                    >
+                  <div className="mt-5 flex flex-wrap gap-2.5">
+                    <Button onClick={handleSave}>Save to library</Button>
+                    <Button variant="ghost" onClick={handleCopy}>
                       Copy text
-                    </button>
-                    <button
-                      type="button"
-                      className="btn ghost"
+                    </Button>
+                    <Button
+                      variant="ghost"
                       onClick={() => {
                         if (result) {
                           setInput(result.text);
@@ -386,143 +412,146 @@ export default function App() {
                       }}
                     >
                       Edit this version
-                    </button>
+                    </Button>
                   </div>
                 </>
               )}
-            </div>
-          </section>
+            </Card>
+          </div>
         )}
 
         {view === "read" && (
-          <section className="reader-layout">
-            <div className="panel glass controls">
-              <h2>Reading controls</h2>
-              <label className="field-label" htmlFor="pick-lesson">
-                Lesson
-              </label>
-              <select
-                id="pick-lesson"
-                className="text-input"
-                value={activeLesson ? activeLesson.id : ""}
-                onChange={(e) => {
-                  setActiveId(e.target.value);
-                  setFocusPara(null);
-                }}
-              >
-                {lessons.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.title}
-                  </option>
-                ))}
-              </select>
-
-              <label className="field-label" htmlFor="font-size">
-                Text size: {settings.size}px
-              </label>
-              <input
-                id="font-size"
-                type="range"
-                min="16"
-                max="30"
-                step="1"
-                value={settings.size}
-                onChange={(e) =>
-                  setSettings({ ...settings, size: Number(e.target.value) })
-                }
-              />
-
-              <label className="field-label" htmlFor="line-spacing">
-                Line spacing: {settings.spacing.toFixed(1)}
-              </label>
-              <input
-                id="line-spacing"
-                type="range"
-                min="1.3"
-                max="2.2"
-                step="0.1"
-                value={settings.spacing}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    spacing: Number(e.target.value),
-                  })
-                }
-              />
-
-              <span className="field-label">Page style</span>
-              <div className="seg" role="group" aria-label="Page style">
-                {[
-                  ["paper", "Paper"],
-                  ["night", "Night"],
-                  ["contrast", "High contrast"],
-                ].map(([key, label]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    className={settings.theme === key ? "seg-btn active" : "seg-btn"}
-                    onClick={() => setSettings({ ...settings, theme: key })}
-                    aria-pressed={settings.theme === key}
-                  >
-                    {label}
-                  </button>
-                ))}
+          <div className="grid items-start gap-5 lg:grid-cols-[320px_1fr]">
+            <Card className="controls p-6">
+              <h2 className="font-display text-xl font-bold">
+                Reading controls
+              </h2>
+              <div className="mt-4">
+                <Label htmlFor="pick-lesson">Lesson</Label>
+                <Select
+                  id="pick-lesson"
+                  value={activeLesson ? activeLesson.id : ""}
+                  onChange={(e) => {
+                    setActiveId(e.target.value);
+                    setFocusPara(null);
+                  }}
+                >
+                  {lessons.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.title}
+                    </option>
+                  ))}
+                </Select>
               </div>
 
-              <span className="field-label">Listen</span>
-              <div className="actions wrap-actions">
-                {!speaking ? (
-                  <button type="button" className="btn primary" onClick={speak}>
-                    Read aloud
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      className="btn primary"
-                      onClick={togglePause}
-                    >
-                      {paused ? "Resume" : "Pause"}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn ghost"
-                      onClick={stopSpeak}
-                    >
-                      Stop
-                    </button>
-                  </>
-                )}
+              <div className="mt-5">
+                <Label htmlFor="font-size">
+                  Text size: {settings.size}px
+                </Label>
+                <input
+                  id="font-size"
+                  type="range"
+                  min="16"
+                  max="30"
+                  step="1"
+                  value={settings.size}
+                  onChange={(e) =>
+                    setSettings({ ...settings, size: Number(e.target.value) })
+                  }
+                  className="w-full"
+                />
               </div>
-              <label className="field-label" htmlFor="speech-rate">
-                Voice speed: {settings.rate.toFixed(1)}x
-              </label>
-              <input
-                id="speech-rate"
-                type="range"
-                min="0.6"
-                max="1.4"
-                step="0.1"
-                value={settings.rate}
-                onChange={(e) =>
-                  setSettings({ ...settings, rate: Number(e.target.value) })
-                }
-              />
-              <p className="hint small">
+
+              <div className="mt-3">
+                <Label htmlFor="line-spacing">
+                  Line spacing: {settings.spacing.toFixed(1)}
+                </Label>
+                <input
+                  id="line-spacing"
+                  type="range"
+                  min="1.3"
+                  max="2.2"
+                  step="0.1"
+                  value={settings.spacing}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      spacing: Number(e.target.value),
+                    })
+                  }
+                  className="w-full"
+                />
+              </div>
+
+              <div className="mt-4">
+                <span className="mb-1.5 block font-display text-sm font-semibold">
+                  Page style
+                </span>
+                <SegmentedControl
+                  label="Page style"
+                  value={settings.theme}
+                  onChange={(theme) => setSettings({ ...settings, theme })}
+                  options={[
+                    ["paper", "Paper"],
+                    ["night", "Night"],
+                    ["contrast", "High contrast"],
+                  ]}
+                />
+              </div>
+
+              <div className="mt-5">
+                <span className="mb-1.5 block font-display text-sm font-semibold">
+                  Listen
+                </span>
+                <div className="flex flex-wrap gap-2.5">
+                  {!speaking ? (
+                    <Button onClick={speak}>Read aloud</Button>
+                  ) : (
+                    <>
+                      <Button onClick={togglePause}>
+                        {paused ? "Resume" : "Pause"}
+                      </Button>
+                      <Button variant="ghost" onClick={stopSpeak}>
+                        Stop
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <Label htmlFor="speech-rate">
+                  Voice speed: {settings.rate.toFixed(1)}x
+                </Label>
+                <input
+                  id="speech-rate"
+                  type="range"
+                  min="0.6"
+                  max="1.4"
+                  step="0.1"
+                  value={settings.rate}
+                  onChange={(e) =>
+                    setSettings({ ...settings, rate: Number(e.target.value) })
+                  }
+                  className="w-full"
+                />
+              </div>
+
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                 Tip: tap any paragraph to focus on it. Tap it again to show
                 everything.
               </p>
-              <button
-                type="button"
-                className="btn ghost"
+              <Button
+                variant="ghost"
+                className="mt-4"
                 onClick={() => window.print()}
               >
                 Print this lesson
-              </button>
-            </div>
+              </Button>
+            </Card>
 
             <article
-              className={`reading-page theme-${settings.theme}`}
+              className={`reading-page theme-${settings.theme} rounded-2xl border border-line px-6 py-8 shadow-[0_2px_10px_rgba(11,79,74,0.07)] sm:px-10`}
               style={{
                 fontSize: `${settings.size}px`,
                 lineHeight: settings.spacing,
@@ -530,19 +559,19 @@ export default function App() {
             >
               {activeLesson ? (
                 <>
-                  <h2>{activeLesson.title}</h2>
-                  <p className="reading-meta">
+                  <h2 className="font-display text-[1.5em] font-bold">
+                    {activeLesson.title}
+                  </h2>
+                  <p className="mb-5 mt-1 text-[0.7em] opacity-75">
                     Reading level grade {activeLesson.grade} - about{" "}
                     {textStats(activeLesson.text).minutes} min read
                   </p>
                   {activeLesson.text.split(/\n\s*\n/).map((p, i) => (
                     <p
                       key={i}
-                      className={
-                        focusPara === null || focusPara === i
-                          ? "para"
-                          : "para dim"
-                      }
+                      className={`para mb-[1em] rounded-lg px-2 py-1 ${
+                        focusPara === null || focusPara === i ? "" : "dim"
+                      }`}
                       onClick={() =>
                         setFocusPara(focusPara === i ? null : i)
                       }
@@ -555,84 +584,86 @@ export default function App() {
                 <p>No lesson yet. Make one clear first, then save it.</p>
               )}
             </article>
-          </section>
+          </div>
         )}
 
         {view === "library" && (
-          <section className="panel glass library">
-            <div className="library-head">
+          <Card className="p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
-                <h2>My offline library</h2>
-                <p className="hint">
+                <h2 className="font-display text-xl font-bold">
+                  My offline library
+                </h2>
+                <p className="mt-2 max-w-xl leading-relaxed text-ink-soft">
                   Lessons are saved on this device only. No account, no
                   internet needed. They stay here when the signal drops.
                 </p>
               </div>
-              <div className="actions">
-                <input
-                  className="text-input search"
+              <div className="flex flex-wrap items-center gap-2.5">
+                <Input
+                  className="search w-56"
                   type="search"
                   placeholder="Search lessons"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   aria-label="Search lessons"
                 />
-                <button
-                  type="button"
-                  className="btn ghost"
+                <Button
+                  variant="ghost"
                   onClick={exportAll}
                   disabled={lessons.length === 0}
                 >
                   Download all (.txt)
-                </button>
+                </Button>
               </div>
             </div>
             {filtered.length === 0 ? (
-              <p className="empty">
+              <p className="mt-5 leading-relaxed text-ink-soft">
                 No lessons match. Make a lesson clear and save it, and it
                 will live here.
               </p>
             ) : (
-              <div className="cards">
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((l) => {
                   const s = textStats(l.text);
                   return (
-                    <article key={l.id} className="card glass-soft">
-                      <h3>{l.title}</h3>
-                      <p className="card-meta">
+                    <article
+                      key={l.id}
+                      className="card flex flex-col rounded-2xl border border-line bg-teal-tint p-5"
+                    >
+                      <h3 className="font-display text-lg font-bold">
+                        {l.title}
+                      </h3>
+                      <p className="mt-1 text-sm text-ink-soft">
                         Grade {l.grade} - {s.words} words - about {s.minutes}{" "}
                         min - saved {formatDate(l.savedAt)}
                       </p>
-                      <p className="card-preview">
+                      <p className="mt-2 flex-1 leading-relaxed">
                         {l.text.slice(0, 160)}
                         {l.text.length > 160 ? "..." : ""}
                       </p>
-                      <div className="actions">
-                        <button
-                          type="button"
-                          className="btn primary small-btn"
-                          onClick={() => openInReader(l.id)}
-                        >
+                      <div className="mt-4 flex flex-wrap gap-2.5">
+                        <Button size="sm" onClick={() => openInReader(l.id)}>
                           Open and read
-                        </button>
-                        <button
-                          type="button"
-                          className="btn ghost small-btn"
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
                           onClick={() => deleteLesson(l.id)}
                         >
                           Remove
-                        </button>
+                        </Button>
                       </div>
                     </article>
                   );
                 })}
               </div>
             )}
-          </section>
+          </Card>
         )}
       </main>
 
-      <footer className="foot glass">
+      <footer className="foot mt-6 rounded-2xl border border-line bg-teal-tint px-6 py-5 text-center leading-relaxed text-ink-soft">
         <p>
           ClearDoor removes one barrier: lesson text that is too hard to
           read. Plain words, short sentences, big readable type, a voice
